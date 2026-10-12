@@ -27,16 +27,16 @@ jobs:
       run: |
         pip install --upgrade "cython<3.0.0" virtualenv buildozer
 
-    - name: Pre-install Android SDK Tools (Fix for Aidl error)
+    - name: Pre-install Android SDK Tools (Updated 2026 Fix)
       run: |
         mkdir -p ~/.buildozer/android/platform
         cd ~/.buildozer/android/platform
-        # Android Command Line Tools डाउनलोड करना
+        # 2026 के अनुसार लेटेस्ट और वर्किंग Android Command Line Tools डाउनलोड करना
         wget https://google.com
-        unzip commandlinetools-linux-9477386_latest.zip -d cmdline-tools
+        unzip commandlinetools-linux-11076708_latest.zip -d cmdline-tools
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
-        # aidl और बाकी टूल्स को पहले से इंस्टॉल करना
+        # aidl और सही build-tools इंस्टॉल करना
         yes | ./cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.2" "platforms;android-33" "platform-tools"
 
     - name: Initialize Buildozer
@@ -49,7 +49,6 @@ jobs:
     - name: Compile APK
       run: |
         export APP_ANDROID_ACCEPT_SDK_LICENSE=1
-        # पर्यावरण पाथ में aidl को शामिल करना
         export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/build-tools/33.0.2
         yes | buildozer -v android debug
 
