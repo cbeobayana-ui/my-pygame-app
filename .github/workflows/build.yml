@@ -24,9 +24,6 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-
     - name: Install System Dependencies
       run: |
         sudo apt-get update
@@ -36,15 +33,19 @@ jobs:
       run: |
         pip install --upgrade "cython<3.0.0" virtualenv buildozer
 
-    - name: Fix Aidl and Licenses
+    - name: Link Pre-installed Android SDK (No Download Needed)
       run: |
-        yes | sdkmanager --sdk_root=$ANDROID_HOME "build-tools;33.0.2" "platforms;android-33" "platform-tools"
+        # GitHub रनर में पहले से मौजूद SDK का पाथ सेट करना
         mkdir -p ~/.buildozer/android/platform/
         ln -s $ANDROID_HOME ~/.buildozer/android/platform/android-sdk
+        
+        # लाइसेंस स्वीकार करना
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
     - name: Initialize Buildozer
       run: |
         buildozer init
+        # Pygame की सेटिंग्स को कॉन्फ़िगर करना
         sed -i 's/requirements = python3,kivy/requirements = python3,pygame/' buildozer.spec
         sed -i 's/#android.ndk = 25b/android.ndk = 25b/' buildozer.spec
         sed -i 's/android.api = 31/android.api = 33/' buildozer.spec
